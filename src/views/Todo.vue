@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: Lewis
  * @Date: 2020-11-20 02:50:18
- * @LastEditTime: 2020-11-23 00:43:52
+ * @LastEditTime: 2020-11-25 02:57:41
  * @LastEditors: Lewis
 -->
 <template>
@@ -50,7 +50,7 @@
 
 <script>
 // @ is an alias to /src
-
+import {db} from '../firebase/db'
 export default {
   name: "Todo",
   components: {},
@@ -58,41 +58,25 @@ export default {
     return {
       newTaskTitle:'',
       tasks: [
-        {
-          id: 1,
-          title: "Wake Up",
-          done: false,
-        },
-        {
-          id: 2,
-          title: "Get bananas",
-          done: false,
-        },
-        {
-          id: 3,
-          title: "Eat bananas",
-          done: false,
-        },
       ],
     };
   },
   methods: {
     doneTask(id) {
-      let task = this.tasks.filter((item) => item.id === id)[0];
-      task.done = !task.done;
+     db.collection('tasks').doc(id).update({done:true})
     },
     deleteTask(id) {
-      this.tasks = this.tasks.filter((item) => item.id !== id);
+      db.collection('tasks').doc(id).delete()
     },
-    addTask(){
-      let obj={
-        id:Date.now(),
-        title:this.newTaskTitle,
-        done:false
-      }
-      this.tasks.push(obj)
-      this.newTaskTitle=''
+   async addTask(){
+     if(this.newTaskTitle){
+       db.collection('tasks').add({title:this.newTaskTitle,done:false})
+       this.newTaskTitle=''
+     }
     }
   },
+  firestore:{
+    tasks:db.collection('tasks')
+  }
 };
 </script>
